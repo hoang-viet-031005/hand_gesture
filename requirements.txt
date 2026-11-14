@@ -1,0 +1,10 @@
+# Colab đã có sẵn hầu hết; chỉ cần cài thêm mediapipe cho demo webcam
+torch
+numpy
+pandas
+scikit-learn
+matplotlib
+seaborn
+pyyaml
+opencv-python
+mediapipe

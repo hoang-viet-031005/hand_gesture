@@ -1,0 +1,42 @@
+# Cấu hình chung cho Model 1 (MediaPipe landmarks -> MLP). Đường dẫn tính từ thư mục gốc project.
+seed: 42
+
+data:
+  train_csv: data/hybrid_manifest/train.csv
+  val_csv:   data/hybrid_manifest/val.csv
+  test_csv:  data/hybrid_manifest/test.csv
+  label_col: label
+  num_landmarks: 21            # 21 điểm x 3 tọa độ (x, y, z) = 63 feature (cột r0..r62)
+
+# Cấu hình data augmentation (học nhận diện cả hai tay trái và phải)
+augment:
+  enabled: true                # cho phép bật/tắt toàn bộ augment
+  mirror: true                 # lật gương x -> -x để học cả tay trái (nối đôi tập train)
+  mirror_prob: 0.5             # dùng cho on-the-fly; nếu nối đôi dữ liệu thì bỏ qua
+  rotate_deg: 15               # góc xoay ngẫu nhiên quanh cổ tay: U(-15, +15) độ
+  scale_range: [0.9, 1.1]      # tỉ lệ co giãn ngẫu nhiên theo trục x, y
+  noise_sigma: 0.01            # độ lệch chuẩn nhiễu Gauss thêm vào landmarks
+  prob: 0.5                    # xác suất áp dụng từng phép ngẫu nhiên on-the-fly
+
+model1_mlp:
+  hidden: [128, 64, 32]
+  dropout: 0.3
+  batch_size: 256
+  epochs: 100
+  lr: 0.001
+  weight_decay: 0.0001
+  patience: 15                 # early stopping theo val loss
+  checkpoint: checkpoints/model1_mlp_best.pth
+  training_curves: reports/figures/model1_mlp_training_curves.png
+  confusion_matrix: reports/confusion_matrices/model1_mlp_confusion_matrix.png
+  report_txt: reports/model1_mlp_classification_report.txt
+
+demo:
+  mirror: false                # giữ để tương thích; model mới nhận diện tốt cả 2 tay mà không cần lật gương
+  tta_mirror: false            # Test-Time Augmentation: trung bình xác suất giữa bản gốc và bản lật
+  cam_width: 640
+  cam_height: 480
+  conf_threshold: 0.60
+  smooth_frames: 5
+  max_seconds: 300
+  hand_model_path: hand_landmarker.task
